@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { Note } from 'src/models/note.entity';
 import { NotesService } from './notes.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('notes')
 @Controller('notes')
 export class NotesController {
   constructor(private readonly noteService: NotesService) {}
