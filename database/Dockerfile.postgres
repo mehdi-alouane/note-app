@@ -1,0 +1,12 @@
+# Use the official PostgreSQL image as a base
+FROM postgres:14
+
+# Set environment variables
+ENV POSTGRES_DB=dhx
+ENV POSTGRES_PASSWORD=mypasswpassword123ord
+
+# Copy initialization scripts
+COPY ./init.sql /docker-entrypoint-initdb.d/
+
+# Expose the PostgreSQL port
+EXPOSE 5432
