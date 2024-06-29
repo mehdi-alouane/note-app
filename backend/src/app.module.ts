@@ -10,7 +10,7 @@ import { UserModule } from './user/user.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: (process.env.ENV === 'production') ? 'note-db' : 'localhost',
       port: 5432,
       username: 'postgres',
       password: 'password123',
