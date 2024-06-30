@@ -5,8 +5,21 @@
       <!-- Main content area -->
       <div class="flex-1 p-8 overflow-y-auto">
         <template v-if="selectedNote">
-          <h1 class="text-4xl font-bold mb-6">{{ selectedNote.title }}</h1>
-          <div class="prose prose-invert" v-html="renderedContent"></div>
+          <input
+            v-if="noteStore.isEditMode"
+            v-model="editableTitle"
+            class="text-4xl font-bold mb-6 bg-gray-800 p-2 w-full"
+          />
+          <h1 v-else class="text-4xl font-bold mb-6">{{ selectedNote.title }}</h1>
+
+          <div
+            v-if="noteStore.isEditMode"
+            contenteditable="true"
+            @input="updateEditableContent"
+            class="prose prose-invert bg-gray-800 p-4"
+            v-html="editableContent"
+          ></div>
+          <div v-else class="prose prose-invert" v-html="renderedContent"></div>
         </template>
         <div v-else class="text-center text-gray-500 mt-20">
           Select a note or create a new one
@@ -16,7 +29,7 @@
   </template>
 
   <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { marked } from 'marked';
   import Sidebar from './Sidebar.vue';
   import { useNoteStore } from '../stores/noteStore';
@@ -33,6 +46,30 @@
     }
     return '';
   });
+
+  const editableTitle = ref('');
+  const editableContent = ref('');
+
+  watch(selectedNote, (newNote) => {
+    if (newNote) {
+      editableTitle.value = newNote.title;
+      editableContent.value = newNote.content;
+    }
+  }, { immediate: true });
+
+  watch(() => noteStore.isEditMode, (newValue) => {
+    if (newValue && selectedNote.value) {
+      editableTitle.value = selectedNote.value.title;
+      editableContent.value = selectedNote.value.content;
+    } else if (!newValue && selectedNote.value) {
+      // Save the note when exiting edit mode
+      noteStore.saveNote(selectedNote.value.id, editableTitle.value, editableContent.value);
+    }
+  });
+
+  function updateEditableContent(event: Event) {
+    editableContent.value = (event.target as HTMLDivElement).innerHTML;
+  }
   </script>
 
   <style>
