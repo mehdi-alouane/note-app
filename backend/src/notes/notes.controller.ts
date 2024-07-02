@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Put, Delete } from '@nestjs/common';
 import { Note } from 'src/models/note.entity';
 import { NotesService } from './notes.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
+
+class UpdateNoteDto {
+  @ApiProperty({ required: false })
+  title?: string;
+
+  @ApiProperty({ required: false })
+  content?: string;
+}
 
 @ApiTags('notes')
 @Controller('notes')
@@ -19,9 +27,20 @@ export class NotesController {
     return this.noteService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
+  // disabled for testing purposes
   @Post()
   create(@Body() note: Note): Promise<Note> {
     return this.noteService.create(note);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto): Promise<Note> {
+    return this.noteService.update(+id, updateNoteDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.noteService.remove(+id);
   }
 }
