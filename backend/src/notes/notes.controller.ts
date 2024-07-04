@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Put, Delete, UnauthorizedException, Req } from '@nestjs/common';
 import { Note } from 'src/models/note.entity';
 import { NotesService } from './notes.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
 
-class UpdateNoteDto {
+export class UpdateNoteDto {
   @ApiProperty({ required: false })
   title?: string;
 
@@ -14,6 +14,7 @@ class UpdateNoteDto {
 
 @ApiTags('notes')
 @Controller('notes')
+@UseGuards(JwtAuthGuard)
 export class NotesController {
   constructor(private readonly noteService: NotesService) {}
 
@@ -23,24 +24,38 @@ export class NotesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Note> {
-    return this.noteService.findOne(+id);
+  async findOne(@Param('id') id: string, @Req() req: Request): Promise<Note> {
+    const user = req['user'];
+    if (!user || !user.id) {
+      throw new UnauthorizedException('User not authenticated or invalid user data');
+    }
+    return this.noteService.findOne(user.id, +id);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // disabled for testing purposes
   @Post()
-  create(@Body() note: Note): Promise<Note> {
-    return this.noteService.create(note);
+  async create(@Body() createNoteDto: Note, @Req() req: Request): Promise<Note> {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException('User not authenticated or invalid user data');
+    }
+    return this.noteService.create(user.id, createNoteDto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto): Promise<Note> {
-    return this.noteService.update(+id, updateNoteDto);
+  async update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto, @Req() req: Request): Promise<Note> {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException('User not authenticated or invalid user data');
+    }
+    return this.noteService.update(user.id, +id, updateNoteDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.noteService.remove(+id);
+  async remove(@Param('id') id: string, @Req() req: Request): Promise<void> {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException('User not authenticated or invalid user data');
+    }
+    return this.noteService.remove(user.id, +id);
   }
 }
