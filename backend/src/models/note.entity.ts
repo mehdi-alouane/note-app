@@ -20,4 +20,10 @@ export class Note {
 
   @ManyToOne(() => User, (user) => user.id)
   user: number;
+
+  @Column({ nullable: true, unique: true })
+  shareableUrl: string;
+
+  @Column({ default: false })
+  isShared: boolean;
 }
