@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Note } from 'src/models/note.entity';
 import { UpdateNoteDto } from './notes.controller';
+import { v4 as uuidv4 } from 'uuid';
+import { User } from 'src/models/user.entity';
 
 @Injectable()
 export class NotesService {
@@ -50,4 +52,24 @@ export class NotesService {
     }
     await this.noteRepository.remove(note);
   }
+
+
+  async generateShareableUrl(id: number, user: User): Promise<string> {
+    const note = await this.findOne(user.id, id);
+    if (!note.shareableUrl) {
+      note.shareableUrl = uuidv4();
+      note.isShared = true;
+      await this.noteRepository.save(note);
+    }
+    return note.shareableUrl;
+  }
+
+  async getNoteByShareableUrl(shareableUrl: string): Promise<Note> {
+    const note = await this.noteRepository.findOne({ where: { shareableUrl } });
+    if (!note || !note.isShared) {
+      throw new NotFoundException('Shared note not found');
+    }
+    return note;
+  }
+
 }
