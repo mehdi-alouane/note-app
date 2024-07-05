@@ -5,4 +5,5 @@ export interface Note {
     created_at?: string;
     updated_at?: string;
     isDeleting?: boolean;
+    isSharing?: boolean;
 }

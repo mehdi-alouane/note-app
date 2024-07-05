@@ -10,17 +10,17 @@
       <p class="text-sm text-gray-600 mb-4">Created on: {{ formatDate(noteStore.currentNote.created_at) }}</p>
       <div class="prose max-w-none text-gray-600 text-3xl">
         <div class="flex flex-wrap gap-2 mb-4 text-sm">
-          <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" class="btn">H1</button>
-          <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" class="btn">H2</button>
-          <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" class="btn">H3</button>
-          <button @click="editor.chain().focus().toggleHeading({ level: 4 }).run()" class="btn">H4</button>
-          <button @click="editor.chain().focus().toggleHeading({ level: 5 }).run()" class="btn">H5</button>
-          <button @click="editor.chain().focus().toggleHeading({ level: 6 }).run()" class="btn">H6</button>
-          <button @click="editor.chain().focus().toggleBulletList().run()" class="btn">Bullet list</button>
-          <button @click="editor.chain().focus().toggleOrderedList().run()" class="btn">Ordered list</button>
-          <button @click="editor.chain().focus().toggleCodeBlock().run()" class="btn">Code block</button>
-          <button @click="editor.chain().focus().toggleBlockquote().run()" class="btn">Blockquote</button>
-          <button @click="editor.chain().focus().setHorizontalRule().run()" class="btn">Horizontal rule</button>
+          <button @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()" class="btn">H1</button>
+          <button @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" class="btn">H2</button>
+          <button @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" class="btn">H3</button>
+          <button @click="editor?.chain().focus().toggleHeading({ level: 4 }).run()" class="btn">H4</button>
+          <button @click="editor?.chain().focus().toggleHeading({ level: 5 }).run()" class="btn">H5</button>
+          <button @click="editor?.chain().focus().toggleHeading({ level: 6 }).run()" class="btn">H6</button>
+          <button @click="editor?.chain().focus().toggleBulletList().run()" class="btn">Bullet list</button>
+          <button @click="editor?.chain().focus().toggleOrderedList().run()" class="btn">Ordered list</button>
+          <button @click="editor?.chain().focus().toggleCodeBlock().run()" class="btn">Code block</button>
+          <button @click="editor?.chain().focus().toggleBlockquote().run()" class="btn">Blockquote</button>
+          <button @click="editor?.chain().focus().setHorizontalRule().run()" class="btn">Horizontal rule</button>
           <button @click="saveNote" class="py-2 px-4 rounded-md bg-blue-500 text-white">Save</button>
         </div>
         <editor-content class="text-gray-600 bg-gray-500/10 border border-color-gray-600 rounded-sm" :editor="editor" />
@@ -92,7 +92,7 @@ async function updateTitle() {
       showSnackbarMessage('Title updated successfully')
     } catch (error) {
       console.error('Error updating title:', error)
-      showSnackbarMessage('Error updating title', 'error')
+      showSnackbarMessage('Error updating title')
     }
   }
 }
@@ -105,12 +105,12 @@ async function saveNote() {
       showSnackbarMessage('Note saved successfully')
     } catch (error) {
       console.error('Error saving note:', error)
-      showSnackbarMessage('Error saving note', 'error')
+      showSnackbarMessage('Error saving note')
     }
   }
 }
 
-function showSnackbarMessage(message: string, type: 'success' | 'error' = 'success') {
+function showSnackbarMessage(message: string) {
   snackbarMessage.value = message
   showSnackbar.value = true
   setTimeout(() => {

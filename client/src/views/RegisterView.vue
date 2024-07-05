@@ -91,7 +91,11 @@
           showSnackbar('Registration successful!')
           router.push('/')
         } catch (error) {
-          showSnackbar(error.response?.data?.message || 'An error occurred. Please try again.')
+          if (error instanceof Error) {
+          showSnackbar(error.message || 'An error occurred. Please try again.');
+        } else {
+          showSnackbar('An unknown error occurred. Please try again.');
+        }
         } finally {
           loading.value = false
         }
