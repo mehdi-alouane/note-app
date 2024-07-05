@@ -11,7 +11,13 @@ CREATE TABLE note (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    userId INTEGER NOT NULL,
+    shareableUrl VARCHAR(255) UNIQUE,
+    isShared BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_user
+        FOREIGN KEY(userId)
+        REFERENCES "user"(id)
 );
 
 -- Create a function to update the updated_at column
@@ -21,7 +27,7 @@ BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 -- Create a trigger to automatically update the updated_at column for note table
 CREATE TRIGGER update_note_modtime

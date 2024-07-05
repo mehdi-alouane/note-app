@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  note-frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - note-backend
+
   note-backend:
     build:
       context: ./backend
@@ -8,7 +17,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password123@note-db:5432/dhx
+      - NODE_ENV=${NODE_ENV:-production}
+      - DB_HOST=${DB_HOST:-note-db}
+      - DB_PORT=5432
+      - DB_NAME=dhx
+      - DB_USER=postgres
+      - DB_PASSWORD=password123
+    command: npm run start:${NODE_ENV:-prod}
     depends_on:
       - note-db
 
