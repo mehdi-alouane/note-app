@@ -12,7 +12,6 @@ export class NoteGateway {
 
   @SubscribeMessage('joinNote')
   handleJoinNote(@MessageBody() noteId: number, @ConnectedSocket() client: Socket) {
-    console.log('noteId', noteId)
     client.join(`note_${noteId}`);
   }
 

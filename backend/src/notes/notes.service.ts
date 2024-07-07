@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Note } from 'src/models/note.entity';
@@ -13,25 +13,45 @@ export class NotesService {
     private noteRepository: Repository<Note>,
   ) {}
 
-  findAll(): Promise<Note[]> {
-    return this.noteRepository.find();
+  async findAll(user_id: any): Promise<Note[]> {
+    const userId = user_id;
+
+    if (!userId) {
+      throw new NotFoundException('User not found in the request');
+    }
+
+    const notes = await this.noteRepository.find({
+      where: {
+        user:  {
+          id: userId
+        }
+      },
+      relations: ['user'],
+    });
+
+    if (!notes || notes.length === 0) {
+      throw new NotFoundException('No notes found for the user');
+    }
+
+    return notes;
   }
 
   findOne(user_id: number, note_id: number): Promise<Note> {
     return this.noteRepository.findOne({
       where: {
         id: note_id,
-        user: user_id
+        user: { id: user_id }
       },
       relations: ['user']
     });
   }
 
-  async create(userId: number, updateNoteDto: UpdateNoteDto): Promise<Note> {
-    const note = await this.noteRepository.create({
-      ...updateNoteDto,
-      user: userId,
+  async create(createNoteDto: Partial<Note>, user_id: number): Promise<Note> {
+    const note = this.noteRepository.create({
+      ...createNoteDto,
+      user: { id: user_id }
     });
+
     return this.noteRepository.save(note);
   }
 

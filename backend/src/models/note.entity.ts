@@ -18,8 +18,8 @@ export class Note {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.id)
-  user: number;
+  @ManyToOne(() => User, user => user.notes)
+  user: User;
 
   @Column({ nullable: true, unique: true })
   shareableUrl: string;
