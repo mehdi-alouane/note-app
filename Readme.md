@@ -1,89 +1,182 @@
-# Note App
+# Note Management Application
 
-An app for managing notes.
+This project is a full-stack application for managing notes, built with NestJS backend and Vue.js 3 frontend. It includes features like creating, editing, deleting, and sharing notes, with authentication using JWT.
 
 ## Table of Contents
 
-- [Setup Instructions](#setup-instructions)
-  - [Running with Docker Compose](#running-with-docker-compose)
-  - [Setting Up the Development Environment](#setting-up-the-development-environment)
-- [Backend (Nest.js)](#backend-nestjs)
-  - [API Documentation](#api-documentation)
-  - [Authentication](#authentication)
-  - [Database Setup](#database-setup)
-- [Frontend (Vue.js)](#frontend-vuejs)
-  - [Application Access](#application-access)
-  - [State Management](#state-management)
-  - [Styling](#styling)
-- [API Endpoints](#api-endpoints)
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [Prerequisites](#prerequisites)
+4. [Setup and Installation](#setup-and-installation)
+5. [Running the Application](#running-the-application)
+6. [API Documentation](#api-documentation)
+7. [Frontend](#frontend)
+8. [Database](#database)
+9. [WebSocket Server](#websocket-server)
+10. [Troubleshooting](#troubleshooting)
 
-## Setup Instructions
+## Features
 
-### Running with Docker Compose
+- User authentication (signup, login, logout)
+- Create, read, update, and delete notes
+- Share notes with other users
+- Real-time updates using WebSockets
 
-1. Ensure Docker and Docker Compose are installed on your machine.
-2. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+## Tech Stack
 
-Run the following command to start the application:
+- Backend: NestJS
+- Frontend: Vue.js 3 with Composition API
+- State Management: Pinia
+- CSS Framework: Tailwind CSS
+- Database: PostgreSQL
+- Containerization: Docker
+- API Documentation: Swagger
 
-```bash
-docker-compose up -d
-```
-This command will build and start the Nest.js backend, Vue.js frontend, and PostgreSQL database.
+## Prerequisites
 
+- Docker and Docker Compose
+- Node.js and npm (for local development)
 
-### Setting Up the Development Environment
-1. Ensure Node.js and npm are installed on your machine.
-2. Install backend dependencies:
+## Setup and Installation
 
-```bash
-cd backend
-npm install
-```
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/note-app.git
+   cd note-app
+   ```
 
-3. Install frontend dependencies:
+2. Create a `.env` file in the root directory with the following content:
+   ```
+   DB_HOST=postgres
+   DB_PORT=5432
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   DB_NAME=note_db
+   JWT_SECRET=your_jwt_secret
+   ```
 
-```bash
-cd ../frontend
-npm install
-```
+3. Build and start the Docker containers:
+   ```
+   docker-compose up -d
+   ```
 
-### Configure environment variables:
+This will start the backend server, frontend application, PostgreSQL database, and any other necessary services.
 
-- Create a .env file in the backend directory and set up necessary variables such as database connection details and JWT secret.
+## Running the Application
 
+After running `docker-compose up -d`, you can access:
 
-## Backend (Nest.js)
+- Frontend application: `http://localhost:8000`
+- Backend API: `http://localhost:3000`
+- API documentation (Swagger): `http://localhost:3000/docs`
 
-### API Documentation
-- Swagger documentation is available at http://localhost:3000/docs.
+## API Documentation
 
-### Authentication
-- JWT authentication is implemented to secure routes.
+The API documentation is available using Swagger at `http://localhost:3000/docs`. This interactive documentation allows you to explore and test all available endpoints.
 
-### Database Setup
-- PostgreSQL database is used. Ensure the database is configured with the correct credentials in the .env file.
+### Main Endpoints:
 
-## Frontend (Vue.js)
+- POST `/auth/signup`: Create a new user account
+- POST `/auth/login`: Authenticate a user and receive a JWT
+- GET `/notes`: Retrieve all notes for the authenticated user
+- POST `/notes`: Create a new note
+- GET `/notes/:id`: Retrieve a specific note
+- PUT `/notes/:id`: Update a specific note
+- DELETE `/notes/:id`: Delete a specific note
+- POST `/notes/:id/share`: Share a note with another user
 
-### Application Access
-- Access the frontend application at http://localhost:8000.
+Note: All note-related routes are protected and require a valid JWT token in the Authorization header.
 
-### State Management
-- Pinia is used for state management in the Vue.js application.
+## Frontend
 
-### Styling
-- Tailwind CSS is utilized for styling frontend components.
+The Vue.js frontend is accessible at `http://localhost:8000`. It uses:
 
-## API Endpoints
+- Vue.js 3 with Composition API for reactive components
+- Pinia for state management
+- Tailwind CSS for styling
 
-- Document all API endpoints here, including their methods, paths, parameters, payloads, and responses. For example:
+Key features include:
 
-- POST /api/auth/login: Endpoint to authenticate and generate JWT token.
-- GET /api/notes: Endpoint to retrieve all notes.
-- POST /api/notes: Endpoint to create a new note.
-- PUT /api/notes/:id: Endpoint to update a note.
-- DELETE /api/notes/:id: Endpoint to delete a note.
+- Authentication portal
+- Note management interface (create, edit, delete, share)
+- Real-time updates using WebSockets
+
+## Database
+
+The PostgreSQL database runs in a Docker container. The connection details are:
+
+- Host: `postgres`
+- Port: `5432`
+- Username: `your_username` (as set in .env)
+- Password: `your_password` (as set in .env)
+- Database name: `note_db`
+
+## WebSocket Server
+
+The WebSocket server is integrated into the NestJS backend, providing real-time updates for note changes.
+
+### WebSocket Gateway
+
+The WebSocket gateway is implemented using NestJS's `@WebSocketGateway()` decorator. It handles real-time communication between the server and clients.
+
+Key features:
+
+- Listens on the same port as the HTTP server (3000)
+- Provides events for note creation, updates, and deletion
+- Authenticates connections using JWT tokens
+
+### Connecting to WebSocket
+
+Clients can connect to the WebSocket server at `ws://localhost:3000`. Authentication is required, so clients should include the JWT token in the connection request.
+
+### WebSocket Events
+
+The WebSocket server emits the following events:
+
+- `noteCreated`: When a new note is created
+- `noteUpdated`: When a note is updated
+- `noteDeleted`: When a note is deleted
+
+Clients can listen to these events to receive real-time updates.
+
+## Testing WebSockets with Postman
+
+You can use Postman to test the WebSocket functionality:
+
+1. Open Postman and create a new WebSocket request.
+2. Set the connection URL to `ws://localhost:3000`.
+3. In the "Headers" tab, add your JWT token:
+   - Key: `Authorization`
+   - Value: `Bearer your_jwt_token_here`
+4. Click "Connect" to establish the WebSocket connection.
+
+Once connected, you can listen for events or send messages:
+
+- To listen for events, add a listener in the "Messages" section:
+  - Event name: `noteCreated` (or `noteUpdated`, `noteDeleted`)
+  - Click "Add a listener"
+
+- To send a message (if your implementation supports it):
+  - In the "Messages" section, select "Message"
+  - Enter your message in JSON format, e.g., `{"event": "createNote", "data": {"title": "New Note", "content": "This is a test note"}}`
+  - Click "Send"
+
+Remember to keep Postman open to maintain the WebSocket connection and receive real-time updates.
+
+## Troubleshooting
+
+1. If you encounter issues with Docker containers not starting:
+   - Ensure Docker is running on your machine
+   - Check for port conflicts
+   - Run `docker-compose down` and then `docker-compose up -d` again
+
+2. If the frontend can't connect to the backend:
+   - Check that all containers are running with `docker-compose ps`
+   - Verify the backend URL in the frontend configuration
+
+3. For database connection issues:
+   - Ensure the PostgreSQL container is running
+   - Check the database credentials in the `.env` file
+
+For any other issues, please check the logs using `docker-compose logs` or file an issue in the project repository.
+
