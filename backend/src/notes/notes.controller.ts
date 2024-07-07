@@ -24,8 +24,8 @@ export class NotesController {
   ) {}
 
   @Get()
-  findAll(): Promise<Note[]> {
-    return this.noteService.findAll();
+  findAll(@Req() request: Request): Promise<Note[]> {
+    return this.noteService.findAll(request['sub']);
   }
 
   @Get(':id')
@@ -39,11 +39,11 @@ export class NotesController {
 
   @Post()
   async create(@Body() createNoteDto: Note, @Req() req: Request): Promise<Note> {
-    const user = req['user'];
+    const user = req['user']['sub'];
     if (!user) {
       throw new UnauthorizedException('User not authenticated or invalid user data');
     }
-    return this.noteService.create(user.id, createNoteDto);
+    return this.noteService.create(createNoteDto, user);
   }
 
   @Put(':id')
